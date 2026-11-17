@@ -1,0 +1,11 @@
+ticket_id,description,category,priority
+UT-001,"At inbound verification, the parcel listed on the truck manifest cannot be found in the receiving area. The committed delivery is today and the recipient has escalated.",missing,high
+UT-002,"The outer carton is split open and the device inside has a visible crack. The service commitment has already been missed.",damaged,high
+UT-003,"A loose package has been scanned into the facility, but the shipment record has no matching customer order or route owner. Routine review is sufficient.",orphan,low
+UT-004,"The consignment is stationary at a transfer centre after missing its planned connection. Delivery is expected tomorrow and the service target is approaching.",delayed,medium
+UT-005,"The parcel contains a blue medium shirt while the confirmed order is for a black large shirt. Customer has escalated and expects delivery today.",wrong_item,high
+UT-006,"The dispatch register confirms handover, yet there is no proof of arrival at the next centre and the customer is asking for an update.",missing,medium
+UT-007,"Liquid has seeped through the packaging and the seal is broken. The order is not urgent and can follow the normal review queue.",damaged,low
+UT-008,"The barcode is readable but resolves to no order in the warehouse system; the package has no assigned owner or manifest link.",orphan,medium
+UT-009,"The consignment has exceeded the planned transit time and has not moved since the previous route scan. The promised date is more than two days away.",delayed,low
+UT-010,"The packing slip lists a phone case, but the package contains a charger. The customer reports an incorrect product and needs urgent help.",wrong_item,high

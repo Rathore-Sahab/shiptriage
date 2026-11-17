@@ -1,0 +1,11 @@
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.DS_Store
+.env
+.streamlit/secrets.toml
+models/*.joblib
+models/metrics.json
+models/unseen_evaluation.json

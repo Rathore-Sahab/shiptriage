@@ -1,0 +1,6 @@
+ticket_ref,description
+DEMO-001,"Tracking has no destination arrival scan after the origin hub handover. Customer delivery is due today."
+DEMO-002,"The parcel packaging is torn and the product has a visible crack. Please capture evidence."
+DEMO-003,"A loose shipment has no matching order or manifest record and is waiting for an owner."
+DEMO-004,"The consignment is stationary at a transfer centre after missing its planned connection."
+DEMO-005,"The order lists a black large shirt but the package contains a blue medium shirt."
