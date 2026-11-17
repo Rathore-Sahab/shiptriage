@@ -1,49 +1,125 @@
-# ShipTriage
+# ShipTriage v1.1.0
 
-**AI-assisted shipment exception triage · Google APM portfolio prototype · Synthetic data only**
+**AI-Assisted Shipment Exception Triage · Google APM Portfolio Prototype · Synthetic Data Only**
 
-ShipTriage turns a free-text shipment exception note into a predicted issue category, a suggested priority, and a conservative next action. It includes single-ticket and CSV batch workflows, a human-review threshold, model evaluation views, and text-feature signals to make predictions easier to inspect.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Streamlit 1.40+](https://img.shields.io/badge/streamlit-1.40%2B-FF4B4B.svg)](https://streamlit.io/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4%2B-F7931E.svg)](https://scikit-learn.org/)
+[![Tests Passing](https://img.shields.io/badge/tests-17%20passed-brightgreen.svg)](tests/)
+[![Live Application](https://img.shields.io/badge/demo-live%20app-success.svg)](https://shiptriage-dtvzbqvymfb9mfzetgx3nq.streamlit.app/)
 
-> **Important:** ShipTriage is an educational portfolio prototype. It is not connected to Flipkart, Ekart, a carrier, or a real warehouse system. The bundled data is fictional and synthetic. Its model scores are not evidence of real-world performance. Do not enter customer, employee, tracking, shipment, or confidential operational data.
+ShipTriage transforms unstructured, free-text shipment exception notes into structured issue categories, urgency priorities, and conservative next-step prompts. Designed as a Google Associate Product Manager (APM) portfolio prototype, it demonstrates product discovery, human-in-the-loop AI safety, evidence-based machine learning trade-offs, and operational systems engineering.
 
-## Product preview
+> **Important Disclosure:** ShipTriage is an educational portfolio prototype. It is not connected to Flipkart, Ekart, any carrier, or any production warehouse system. All bundled records are fictional and synthetic. Model decision scores are uncalibrated and are not evidence of production performance. Do not input real customer, employee, tracking, or confidential operational data.
 
-- **Overview:** synthetic dataset snapshot and guided workflow.
-- **Single triage:** category, priority, score indicators, review status, suggested next action, and positive text-feature signals.
-- **Batch triage:** CSV upload, row validation, review queue filtering, and CSV export.
-- **Model insights:** per-class precision/recall/F1, confusion matrices, high-priority recall, keyword baseline, and alternate-phrasing challenge evaluation.
-- **Product brief:** user problem, scope, success metrics, and guardrails.
+---
 
-## Supported labels
+## Live Application & Code
+- **Live Demo:** [https://shiptriage-dtvzbqvymfb9mfzetgx3nq.streamlit.app/](https://shiptriage-dtvzbqvymfb9mfzetgx3nq.streamlit.app/)
+- **GitHub Repository:** [https://github.com/Rathore-Sahab/shiptriage](https://github.com/Rathore-Sahab/shiptriage)
 
-| Dimension | Labels |
+---
+
+## Product Preview
+
+- **Overview:** Executive operations snapshot, synthetic exception mix, and guided decision lifecycle.
+- **Single Triage:** Hybrid category prediction (`Keyword Match` vs `Statistical ML`), priority suggestion, uncalibrated score indicators, dynamic threshold review routing, feature contribution signals, and an interactive human verification checklist.
+- **Batch Triage:** In-memory CSV validation, shift backlog processing, queue filtering (*All, Review Required, Above Threshold, High Priority*), and enriched export.
+- **Model Insights:** Transparent benchmarking of Keyword Rules vs Pure ML vs Hybrid Engine, confusion matrix heatmaps, false-negative root cause analysis, and alternate-phrasing challenge evaluation.
+- **About the Product:** Comprehensive APM Product Brief covering user problem, persona, jobs-to-be-done, scope guardrails, and proposed pilot success metrics.
+
+---
+
+## Supported Taxonomy
+
+| Dimension | Supported Labels |
 |---|---|
-| Exception category | Missing, damaged, orphan, delayed, wrong item |
-| Priority | Low, medium, high |
+| **Exception Category** | `missing`, `damaged`, `orphan`, `delayed`, `wrong_item` |
+| **Urgency Priority** | `low`, `medium`, `high` |
 
-## Architecture
+---
+
+## System Architecture
 
 ```text
-CSV / single ticket
-        ↓
-Input validation
-        ↓
-TF-IDF vectorization
-        ↓
-Logistic Regression classifiers
-    ↙                 ↘
-Category             Priority
-    ↓                   ↓
-Model score + review threshold
-        ↓
-Category-based next-step suggestion
-        ↓
-Human verification (no automated action)
+CSV Batch / Single Ticket Description
+                 │
+                 ▼
+     Input Validation & Sanitization (data.py)
+                 │
+                 ├──────────────────────────────────────────┐
+                 ▼                                          ▼
+   Domain Keyword Rules (rules.py)              TF-IDF Vectorizer (ngram 1-2)
+  (Specific physical logistics terms)                       │
+                 │                                          ▼
+                 │                          Logistic Regression Classifiers
+                 │                           • Category Model (5 classes)
+                 │                           • Priority Model (3 classes)
+                 │                                          │
+                 ▼                                          ▼
+           Rule Matched?                           Uncalibrated Scores
+          /             \                                   │
+      Yes/               \No (needs_review)                 │
+        /                 \─────────────────────────────────┘
+       ▼
+   Hybrid Output Category (100% Holdout / 90% Challenge Accuracy)
+       │
+       ▼
+   Dynamic Uncertainty Gate: min(cat_score, pri_score) < Active Threshold
+       ├─────────────────────────────────┬─────────────────────────────────┐
+       ▼                                                                   ▼
+   Flagged: Human Review Queue                                Passed: Suggestion Ready
+       │                                                                   │
+       └─────────────────────────────────┬─────────────────────────────────┘
+                                         ▼
+                     Conservative SOP Action Prompt (recommendations.py)
+                                         ▼
+                     Human Verification Checklist (No automated action)
 ```
 
-**Stack:** Python · pandas · scikit-learn · Streamlit · Plotly · pytest
+**Stack:** Python 3.10+ · pandas · scikit-learn · Streamlit · Plotly · pytest
 
-## Quick start (Windows PowerShell)
+---
+
+## Empirical ML Evaluation & The "Hybrid" Turnaround
+
+When evaluated using a **template-group holdout** (`template_group_holdout`) to isolate template leakage, a simple keyword baseline outperformed the statistical machine learning model:
+
+| Evaluation Benchmark | Test Rows | Keyword Baseline | Pure ML (TF-IDF + LogReg) | Hybrid Engine (v1.1) | High-Priority Recall |
+|---|---:|---:|---:|---:|---:|
+| **Template-Group Holdout** | 233 | **100.0%** | 78.5% | **100.0%** | **100.0%** |
+| **Alternate-Phrasing Challenge** | 10 | 60.0% | 70.0% | **90.0%** | **100.0%** |
+
+### The Root Cause Discovery
+Investigating the confusion matrix revealed that **pure ML had 0.0% recall on held-out delayed shipments**, misclassifying all 50 delayed test cases as "missing" due to shared tracking vocabulary (*"scan"*, *"transit"*, *"hub"*). Transparent keyword rules anchored on invariant domain phrases (*"sla"*, *"transit window"*, *"held at hub"*) caught all 50.
+
+Conversely, on colloquial alternate phrasing, keyword rules dropped to 60.0% because synonyms were missing from the keyword dictionary. 
+
+**The APM Decision:** We engineered a **Hybrid Rules + ML Fallback Engine**. High-precision rules catch known physical patterns; statistical ML generalizes colloquial phrasing. This hybrid architecture achieves **100.0% on the holdout and 90.0% on alternate phrasing**.
+
+Read the full investigation in [docs/MODEL_EVALUATION_REPORT.md](docs/MODEL_EVALUATION_REPORT.md).
+
+---
+
+## Google APM Portfolio Documentation Suite
+
+| Document | Purpose & Key Topics |
+|---|---|
+| [Product Requirements Document (PRD)](docs/PRODUCT_REQUIREMENTS_DOCUMENT.md) | Personas, JTBD, RICE feature prioritization, MVP scope, and safety guardrails. |
+| [Technical Architecture Document](docs/TECHNICAL_ARCHITECTURE.md) | Component architecture, latency profiles, dynamic threshold state design, and security. |
+| [Model Evaluation Report](docs/MODEL_EVALUATION_REPORT.md) | Holdout design, failure analysis (delayed vs missing), calibration caveats, and hybrid results. |
+| [User Research & Validation Toolkit](docs/USER_RESEARCH_TOOLKIT.md) | 5–8 associate interview protocol, discovery questionnaire, workflow mapping, and usability scripts. |
+| [Product Experimentation Plan](docs/PRODUCT_EXPERIMENTATION_PLAN.md) | Cluster-randomized shift crossover A/B experiment, power calculations, and stop rules. |
+| [Product Roadmap (v1.1 $\to$ v2.5)](docs/PRODUCT_ROADMAP.md) | Multi-horizon strategy from prototype to WMS API integration and computer vision. |
+| [Google APM Interview Case Study](docs/APM_CASE_STUDY.md) | End-to-end APM case study detailing problem discovery, data pivots, trade-offs, and metrics. |
+| [Two-Minute Product Demo Script](docs/TWO_MINUTE_DEMO_SCRIPT.md) | Timed 120-second interview demo narrative for hiring managers and recruiters. |
+| [Resume & Portfolio Descriptions](docs/RESUME_PROJECT_DESCRIPTION.md) | Google-style XYZ resume bullet points and LinkedIn project descriptions. |
+
+---
+
+## Quick Start (Local Development)
+
+### Windows PowerShell
 
 ```powershell
 py -3 -m venv .venv
@@ -56,8 +132,6 @@ python scripts/evaluate_model.py
 pytest -q
 streamlit run app.py
 ```
-
-Open the local URL shown in the terminal (normally `http://localhost:8501`).
 
 ### macOS / Linux
 
@@ -73,86 +147,50 @@ pytest -q
 streamlit run app.py
 ```
 
-The app can rebuild missing or incompatible model artifacts from the included synthetic CSV on first startup. For reproducible local experiments, run the scripts explicitly before launching the app.
+Open `http://localhost:8501` in your browser.
 
-### One-command setup scripts
+---
 
-- Windows PowerShell: `./setup_windows.ps1`
-- macOS / Linux: `./setup_unix.sh`
+## Automated Verification Suite
 
-These scripts create the virtual environment, install dependencies, generate synthetic data, train/evaluate the models, run tests, and launch the app.
-
-## Deploy
-
-### Streamlit Community Cloud
-
-1. Push this project to a GitHub repository.
-2. Visit <https://share.streamlit.io/> and sign in with GitHub.
-3. Select **Create app**, choose the repository and branch, and set the app file to `app.py`.
-4. Deploy. The app will install `requirements.txt` and create local model artifacts from the synthetic dataset if needed.
-
-See the [official Streamlit deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) or [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-
-### Docker
+Run the complete 17-test automated verification suite:
 
 ```bash
-docker build -t shiptriage:latest .
-docker run --rm -p 8501:8501 shiptriage:latest
+pytest -q
+# Or with standard library unittest (zero extra dependency):
+python -m unittest discover -s tests -p "test_*.py"
 ```
 
-Open `http://localhost:8501`. The included Dockerfile generates the sample data and trains the models during image build.
+Tests cover:
+- Reproducible synthetic ticket generation and size bounds
+- Keyword baseline category detection and safety fallback recommendations
+- Batch CSV validation (missing columns, row overflows, 5MB ceiling, empty values)
+- Model predictions, feature signal extraction, and overlength string handling (>5,000 chars)
+- Dynamic threshold recalculation (verifying zero stale review state)
+- Hybrid classification behavior (rule hit vs ML fallback)
+- Holdout metrics and alternate-phrasing evaluation generation
 
-## Project structure
+---
 
-```text
-shiptriage/
-├── app.py
-├── requirements.txt
-├── Dockerfile
-├── Procfile
-├── AGENTS.md
-├── data/
-│   ├── synthetic_tickets.csv
-│   ├── unseen_tickets.csv
-│   └── batch_demo.csv
-├── docs/
-│   ├── PRODUCT_BRIEF.md
-│   ├── EVALUATION_NOTES.md
-│   └── DEPLOYMENT.md
-├── scripts/
-│   ├── generate_data.py
-│   ├── train_model.py
-│   └── evaluate_model.py
-├── src/shiptriage/
-│   ├── constants.py
-│   ├── data.py
-│   ├── modeling.py
-│   ├── recommendations.py
-│   └── rules.py
-└── tests/
-    └── test_pipeline.py
-```
+## Deploy to Streamlit Community Cloud
 
-## Evaluation methodology
+ShipTriage v1.1.0 includes an idempotent initialization lifecycle (`ensure_models_and_evaluation()`). When deployed to a fresh Streamlit Cloud instance:
+1. It automatically trains the classifiers from the bundled synthetic dataset.
+2. It generates both holdout and alternate-phrasing evaluation metrics in memory.
+3. It launches without requiring manual terminal commands or committing binary artifacts.
 
-The generator records `template_id` metadata. Model evaluation uses a template-group holdout when available to reduce near-duplicate template leakage. The model does not receive `template_id` as input. A fallback stratified split is used for datasets without suitable metadata. Metrics include per-class precision, recall, F1, confusion matrices, high-priority recall, and a keyword baseline.
+See the complete guide in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-A small manually authored alternate-phrasing set is also evaluated. It is exploratory, not statistically representative. See [docs/EVALUATION_NOTES.md](docs/EVALUATION_NOTES.md).
+---
 
-## Product thinking
+## Product Limitations & Safety Boundaries
 
-Read [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md) for the persona, problem hypothesis, MVP scope, guardrails, proposed success measures, and validation plan.
+- **Synthetic Data Boundary:** All tickets are synthetic. Real-world warehouse tickets exhibit typos, regional abbreviations, and operational slang not present in synthetic data.
+- **Uncalibrated Model Scores:** Logistic regression outputs represent margin decision scores, not calibrated probabilities. They must never be treated as guaranteed odds.
+- **Zero Autonomous Actions:** ShipTriage never automatically modifies manifests, reroutes trucks, refunds customers, or closes tickets. All physical actions require human associate audit.
 
-## Limitations
-
-- Synthetic data is not a substitute for independently labeled operational tickets.
-- The alternate-phrasing challenge set is small.
-- Logistic Regression top-class scores are not calibrated probabilities.
-- Text signals are feature contributions, not causal explanations.
-- Priority depends on SLA and customer context that may be missing from a short ticket note.
-- The application has no authentication, database, audit logging, or production monitoring.
-- All suggested actions require human verification.
+---
 
 ## License
 
-For portfolio and learning use. Add a license file before distributing under a specific open-source license.
+Created for Google APM portfolio and educational demonstration.

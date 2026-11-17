@@ -22,6 +22,7 @@ def main() -> None:
     print(f"Priority accuracy: {metrics['priority_accuracy']:.3f}")
     print(f"High-priority recall: {metrics['high_priority_recall']:.3f}")
     print(f"Keyword baseline accuracy: {metrics['keyword_baseline_accuracy']:.3f}")
+    print(f"Hybrid category accuracy: {metrics.get('hybrid_accuracy', 0.0):.3f}")
     print("Artifacts saved in models/.")
 
 
